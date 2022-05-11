@@ -14,7 +14,7 @@ import { DataTypes } from "sequelize";
 import sequelize from "../utils/database";
 
 @Table
-export class Users extends Model {
+export class Product_Category extends Model {
   @AutoIncrement
   @PrimaryKey
   @Column(DataTypes.INTEGER)
@@ -26,17 +26,9 @@ export class Users extends Model {
 
   @AllowNull(false)
   @Column(DataTypes.STRING)
-  password!: string;
+  imageUrl!: string;
 
   @AllowNull(false)
   @Column(DataTypes.STRING)
-  email!: string;
-
-  @AllowNull(true)
-  @Column(DataTypes.STRING)
-  address!: string;
-
-  @AllowNull(true)
-  @Column(DataTypes.STRING)
-  phoneNumber!: string;
+  description!: string;
 }

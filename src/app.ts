@@ -1,52 +1,63 @@
 import express from "express";
+import { Cart } from "./models/Cart";
+import { Cart_item } from "./models/Cart_item";
+import { Inventory } from "./models/Inventory";
+import { Order } from "./models/Order";
+import { Order_Item } from "./models/Order_Item";
+import { Payment_Details } from "./models/Payment_Details";
+import { Product } from "./models/Product";
+import { Product_Category } from "./models/Product_Category";
+import { Users } from "./models/Users";
 import sequelize from "./utils/database";
+import authRoute from './routes/Auth';
+import bodyParser from 'body-parser';
 
 require("dotenv").config();
-// const sequelize = new Sequelize(
-//     process.env.DATABASE_NAME!,
-//     process.env.DATABASE_USERNAME!,
-//     process.env.DATABASE_PASSWORD,
-//     {
-//       dialect: "mysql",
-
-//       host: process.env.DATABASE_HOST,
-//       port: +process.env.DATABASE_PORT!,
-
-//     }
-//   );
-
-// const User = sequelize.define('User',{
-//     id: {
-//       type: DataTypes.INTEGER,
-//       autoIncrement: true,
-//       primaryKey: true,
-//     },
-//     email: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//     },
-//     name: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//     },
-//     password: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//     },
-//     address: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//     },
-//     phoneNumer: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//     },
-//   },);
 
 const app = express();
+app.use(bodyParser.json());
+
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  next();
+});
+
+//register routes for the REST Api
+app.use('/auth',authRoute);
+
+// app.use('/admin');
+
+app.use((error:any, req:any, res:any, next:any) => {
+
+  const status = error.statusCode || 500;
+  const message = error.message;
+  res.status(status).json({
+    message: message,
+  });
+});
+
+Users.hasOne(Cart);
+Cart.belongsTo(Users);
+Product.belongsTo(Users,{constraints:true, onDelete:'CASCADE'});
+Users.hasMany(Product);
+Users.hasMany(Product_Category);
+Product_Category.belongsTo(Users);
+Product_Category.hasMany(Product);
+Product.belongsTo(Product_Category);
+Inventory.hasOne(Product);
+Product.belongsTo(Inventory);
+Cart.belongsToMany(Product ,{through:Cart_item});
+Users.hasMany(Order);
+Order.belongsTo(Users);
+Order.belongsToMany(Product,{through:Order_Item});
+Order.hasOne(Payment_Details);
+
 
 sequelize
-  .sync({ alter: true })
+  // .sync({ alter: true })
+  .sync()
   .then((res) => {
     //console.log(res);
     console.log("Connection has been established successfully.");

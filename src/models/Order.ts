@@ -14,11 +14,22 @@ import {
   import sequelize from "../utils/database";
   
   @Table
-  export class Cart extends Model {
+  export class Order extends Model {
     @AutoIncrement
     @PrimaryKey
     @Column(DataTypes.INTEGER)
     id!: number;
-  
+    
+    @AllowNull(false)
+    @Column(DataTypes.STRING)
+    address!:string;
+
+    @AllowNull(false)
+    @Column(DataTypes.STRING)
+    phoneNumber!:string;
+
+    @AllowNull(false)
+    @Column(DataTypes.STRING)
+    total!:string;
   }
   

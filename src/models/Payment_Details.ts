@@ -14,11 +14,19 @@ import {
   import sequelize from "../utils/database";
   
   @Table
-  export class Cart extends Model {
+  export class Payment_Details extends Model {
     @AutoIncrement
     @PrimaryKey
     @Column(DataTypes.INTEGER)
     id!: number;
-  
+    
+    @AllowNull(false)
+    @Column(DataTypes.INTEGER)
+    amount!: number;
+
+    @AllowNull(false)
+    @Column(DataTypes.STRING)
+    pay_type!:string;
+
   }
   
