@@ -8,10 +8,12 @@ import {
   PrimaryKey,
   NotNull,
   AllowNull,
+  ForeignKey,
 } from "sequelize-typescript";
 import { DataTypes } from "sequelize";
 
 import sequelize from "../utils/database";
+import { Users } from "./Users";
 
 @Table
 export class Product_Category extends Model {
@@ -31,4 +33,9 @@ export class Product_Category extends Model {
   @AllowNull(false)
   @Column(DataTypes.STRING)
   description!: string;
+  
+  @AllowNull(true)
+  @ForeignKey(() => Users)
+  @Column(DataTypes.INTEGER)
+  UserId!: number
 }

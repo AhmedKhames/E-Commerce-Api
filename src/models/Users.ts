@@ -10,8 +10,10 @@ import {
   AllowNull,
 } from "sequelize-typescript";
 import { DataTypes } from "sequelize";
+// import { HasManyGetAssociationsMixin, HasManyAddAssociationMixin, HasManyHasAssociationMixin, Association, HasManyCountAssociationsMixin, HasManyCreateAssociationMixin } from 'sequelize';
 
 import sequelize from "../utils/database";
+import { Product_Category } from "./Product_Category";
 
 @Table
 export class Users extends Model {
@@ -39,4 +41,10 @@ export class Users extends Model {
   @AllowNull(true)
   @Column(DataTypes.STRING)
   phoneNumber!: string;
+
+  // public createProduct_Category?:HasManyGetAssociationsMixin<Product_Category> ;
+
+
+
+
 }

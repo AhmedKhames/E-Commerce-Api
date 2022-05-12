@@ -1,7 +1,6 @@
 import express from "express";
 import { Cart } from "./models/Cart";
 import { Cart_item } from "./models/Cart_item";
-import { Inventory } from "./models/Inventory";
 import { Order } from "./models/Order";
 import { Order_Item } from "./models/Order_Item";
 import { Payment_Details } from "./models/Payment_Details";
@@ -10,7 +9,9 @@ import { Product_Category } from "./models/Product_Category";
 import { Users } from "./models/Users";
 import sequelize from "./utils/database";
 import authRoute from './routes/Auth';
+import adminRoute from './routes/Admin';
 import bodyParser from 'body-parser';
+import { isAuth } from "./middleware/isAuth";
 
 require("dotenv").config();
 
@@ -24,10 +25,11 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(isAuth)
 //register routes for the REST Api
 app.use('/auth',authRoute);
 
-// app.use('/admin');
+app.use('/admin',adminRoute);
 
 app.use((error:any, req:any, res:any, next:any) => {
 
@@ -46,8 +48,6 @@ Users.hasMany(Product_Category);
 Product_Category.belongsTo(Users);
 Product_Category.hasMany(Product);
 Product.belongsTo(Product_Category);
-Inventory.hasOne(Product);
-Product.belongsTo(Inventory);
 Cart.belongsToMany(Product ,{through:Cart_item});
 Users.hasMany(Order);
 Order.belongsTo(Users);
@@ -56,7 +56,7 @@ Order.hasOne(Payment_Details);
 
 
 sequelize
-  // .sync({ alter: true })
+  // .sync({ force: true })
   .sync()
   .then((res) => {
     //console.log(res);

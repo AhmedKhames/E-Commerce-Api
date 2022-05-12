@@ -35,4 +35,8 @@ export class Product extends Model {
   @AllowNull(false)
   @Column(DataTypes.DOUBLE)
   price!: number;
+
+  @AllowNull(false)
+  @Column(DataTypes.DOUBLE)
+  quantity!: number;
 }

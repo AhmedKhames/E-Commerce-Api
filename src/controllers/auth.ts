@@ -4,6 +4,7 @@ import { validationResult } from "express-validator";
 import bcrypt from "bcryptjs";
 import { constants } from "fs";
 import jwt, { Jwt } from "jsonwebtoken";
+import { isAuth } from "../middleware/isAuth";
 
 require("dotenv").config();
 
@@ -16,6 +17,11 @@ interface BodyData {
 }
 
 const signup = (req: express.Request, res: express.Response, next: any) => {
+  
+  // if (!req.isAuth) {
+  //   return res.status(401).json({ message :"Unauthorized" });
+  // }
+
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -30,7 +36,7 @@ const signup = (req: express.Request, res: express.Response, next: any) => {
   bcrypt
     .hash(password, 12)
     .then((hashedPassword) => {
-      const user = Users.create({
+      const user =  Users.create({
         name: name,
         password: hashedPassword,
         email: email,

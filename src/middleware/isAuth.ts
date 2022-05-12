@@ -26,6 +26,7 @@ const isAuth = (req: Request, res: Response, next: NextFunction)=>{
 
     if (!decodedToken) {
         req.isAuth = false;
+        const error = new Error('Unauthorized')
         return next();
     }
 

@@ -2,7 +2,7 @@ import express from "express";
 import { body, CustomValidator, validationResult } from "express-validator";
 import { signup, login } from "../controllers/auth";
 import { Users } from "../models/Users";
-import { isAuth } from "../middleware/isAuth";
+
 
 const router = express.Router();
 
@@ -29,7 +29,6 @@ const isValidUser: CustomValidator = (value) => {
 
 router.put(
   "/signup",
-  isAuth,
   [
     body("email")
       .isEmail()

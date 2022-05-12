@@ -1,4 +1,11 @@
 {
+  // "ts-node": {
+  //   "files": true
+  // },
+  // "files": [
+  //   "src/customTypes/CustomRequest.d.ts",
+    
+  // ],
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig.json to read more about this file */
 
