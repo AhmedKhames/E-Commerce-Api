@@ -38,4 +38,7 @@ export class Product_Category extends Model {
   @ForeignKey(() => Users)
   @Column(DataTypes.INTEGER)
   UserId!: number
+
+  
+
 }

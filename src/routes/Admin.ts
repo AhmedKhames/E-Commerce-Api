@@ -1,6 +1,6 @@
 import express from "express";
 import { body, CustomValidator, validationResult } from "express-validator";
-import { createCategory, createProduct, updateCategory, updateProduct } from "../controllers/admin";
+import { createCategory, createProduct, deleteCategory, deleteProduct, updateCategory, updateProduct } from "../controllers/admin";
 import { signup, login } from "../controllers/auth";
 import { Users } from "../models/Users";
 
@@ -28,13 +28,15 @@ router.post(
   createProduct
 );
 
-router.put("/update-category/:catId", [
+router.put("/update-category/:id"
+, [
   body("name").not().isEmpty().trim(),
   body("imageUrl").not().isEmpty().trim(),
   body("description").not().isEmpty().trim(),
-],updateCategory);
+]
+,updateCategory);
 
-router.put("/update-product", [
+router.put("/update-product/:id", [
   body("name").not().isEmpty().trim(),
   body("imageUrl").not().isEmpty().trim(),
   body("description").not().isEmpty().trim(),
@@ -43,7 +45,7 @@ router.put("/update-product", [
   body("catName").not().isEmpty().trim(),
 ],updateProduct);
 
-router.delete("/delete-category");
-router.delete("/delete-product");
+router.delete("/delete-category/:id",deleteCategory);
+router.delete("/delete-product/:id",deleteProduct);
 
 export default router;
