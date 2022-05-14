@@ -8,18 +8,62 @@ import { Product } from "./models/Product";
 import { Product_Category } from "./models/Product_Category";
 import { Users } from "./models/Users";
 import sequelize from "./utils/database";
-import authRoute from './routes/Auth';
-import adminRoute from './routes/Admin';
-import bodyParser from 'body-parser';
+import authRoute from "./routes/Auth";
+import adminRoute from "./routes/Admin";
+import bodyParser from "body-parser";
 import { isAuth } from "./middleware/isAuth";
+import multer from "multer";
+import fs from "fs";
+import path from "path";
+const { v4: uuidv4 } = require('uuid');
 
 require("dotenv").config();
 
 const app = express();
+
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    fs.mkdir(path.join(__dirname,'..', "images"), () => {
+      //console.log(path.join(__dirname,'..', "images"))
+      cb(null, "images");
+    });
+  },
+  filename: (req, file, cb) => {
+   
+    cb(null, uuidv4() + "-" + file.originalname);
+  },
+});
+
+const fileFilter = (
+  req: express.Request,
+  file: Express.Multer.File,
+  cb: any
+) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
 app.use(bodyParser.json());
-app.use(express.urlencoded({
-  extended:false
-}))
+
+app.use(
+  multer({
+    storage: fileStorage,
+    fileFilter: fileFilter,
+  }).single("imageUrl")
+);
+
+app.use(
+  express.urlencoded({
+    extended: false,
+  })
+);
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE");
@@ -27,14 +71,13 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(isAuth)
+app.use(isAuth);
 //register routes for the REST Api
-app.use('/auth',authRoute);
+app.use("/auth", authRoute);
 
-app.use('/admin',adminRoute);
+app.use("/admin", adminRoute);
 
-app.use((error:any, req:any, res:any, next:any) => {
-
+app.use((error: any, req: any, res: any, next: any) => {
   const status = error.statusCode || 500;
   const message = error.message;
   res.status(status).json({
@@ -42,20 +85,20 @@ app.use((error:any, req:any, res:any, next:any) => {
   });
 });
 
+/// create tables and its relationships MySql;
 Users.hasOne(Cart);
 Cart.belongsTo(Users);
-Product.belongsTo(Users,{constraints:true, onDelete:'CASCADE'});
+Product.belongsTo(Users, { constraints: true, onDelete: "CASCADE" });
 Users.hasMany(Product);
 Users.hasMany(Product_Category);
 Product_Category.belongsTo(Users);
 Product_Category.hasMany(Product);
 Product.belongsTo(Product_Category);
-Cart.belongsToMany(Product ,{through:Cart_item});
+Cart.belongsToMany(Product, { through: Cart_item });
 Users.hasMany(Order);
 Order.belongsTo(Users);
-Order.belongsToMany(Product,{through:Order_Item});
+Order.belongsToMany(Product, { through: Order_Item });
 Order.hasOne(Payment_Details);
-
 
 sequelize
   // .sync({ force: true })

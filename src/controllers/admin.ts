@@ -25,9 +25,15 @@ const createCategory = (req: Request, res: Response, next: NextFunction) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
+
+  if (!req.file) {
+    return res.status(422).json({ message: "No Image Provided" });
+  }
+
   const body: ProductCatBody = req.body;
   const name = body.name;
-  const imageUrl = body.imageUrl;
+  const imageUrl = req.file.path.replace("\\", "/");
+  console.log(imageUrl);
   const description = body.description;
 
   Product_Category.create({
@@ -64,17 +70,16 @@ const updateCategory = async function (
 
   const body: ProductCatBody = req.body;
   const name = body.name;
-  const imageUrl = body.imageUrl;
+  let imageUrl = body.imageUrl;
   const description = body.description;
 
-  // if (req.file) {
-  //     imageUrl = req.file.path;
-  //   }
-  //   if (!imageUrl) {
-  //     const error = new Error("No file picked.");
-  //     error.statusCode = 422;
-  //     throw error;
-  //   }
+  if (req.file) {
+    clearImage(body.imageUrl);
+    imageUrl = req.file.path.replace("\\", "/");
+  }
+  if (!imageUrl) {
+    return res.status(422).json({ message: "No Image Provided" });
+  }
   try {
     const productCat = await Product_Category.findByPk(catId);
     let updatedCat;
@@ -82,7 +87,6 @@ const updateCategory = async function (
       return res.status(404).json({ message: "Product Not Found" });
     }
     if (productCat.UserId.toString() === req.userId.toString()) {
-      // return res.status(401).json({ message: "You should be the admin" });
       productCat.imageUrl = imageUrl;
       productCat.name = name;
       productCat.description = description;
@@ -99,7 +103,11 @@ const updateCategory = async function (
   }
 };
 
-const deleteCategory = async function(req: Request, res: Response, next: NextFunction) {
+const deleteCategory = async function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   const catId = req.params.id;
   if (!req.isAuth) {
     return res.status(401).json({ message: "Unauthorized" });
@@ -110,25 +118,26 @@ const deleteCategory = async function(req: Request, res: Response, next: NextFun
   }
   try {
     const productCat = await Product_Category.findByPk(catId);
-    //let updatedCat;
     if (!productCat) {
       return res.status(404).json({ message: "Product Not Found" });
     }
     if (productCat.UserId.toString() === req.userId.toString()) {
-      // return res.status(401).json({ message: "You should be the admin" });
-     productCat.destroy().then(success =>{
-      res.status(200).json({
-        message: "Category deleted",
-      });
-     }).catch(err=>{
-      next(err);
-     });
-      
+      let imagePath = productCat.imageUrl;
+      productCat
+        .destroy()
+        .then((success) => {
+          clearImage(imagePath);
+          res.status(200).json({
+            message: "Category deleted",
+          });
+        })
+        .catch((err) => {
+          next(err);
+        });
     }
   } catch (error) {
     next(error);
   }
-
 };
 
 const createProduct = (req: Request, res: Response, next: NextFunction) => {
@@ -139,9 +148,14 @@ const createProduct = (req: Request, res: Response, next: NextFunction) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
+
+  if (!req.file) {
+    return res.status(422).json({ message: "No Image Provided" });
+  }
+
   const body: ProductCatBody = req.body;
   const name = body.name;
-  const imageUrl = body.imageUrl;
+  const imageUrl = req.file.path.replace("\\", "/");
   const description = body.description;
   const price = body.price;
   const quantity = body.quantity;
@@ -165,7 +179,7 @@ const createProduct = (req: Request, res: Response, next: NextFunction) => {
             ProductCategoryId: catId?.id,
           });
         })
-        .then((upProduct) => {
+        .then(() => {
           res.status(201).json({
             message: "product Created Successfully",
             product: prod,
@@ -194,19 +208,19 @@ const updateProduct = async function (
 
   const body: ProductCatBody = req.body;
   const name = body.name;
-  const imageUrl = body.imageUrl;
+  let imageUrl = body.imageUrl;
   const description = body.description;
   const price = body.price;
   const quantity = body.quantity;
   const catName = body.catName;
-  // if (req.file) {
-  //     imageUrl = req.file.path;
-  //   }
-  //   if (!imageUrl) {
-  //     const error = new Error("No file picked.");
-  //     error.statusCode = 422;
-  //     throw error;
-  //   }
+
+  if (req.file) {
+    clearImage(body.imageUrl);
+    imageUrl = req.file.path.replace("\\", "/");
+  }
+  if (!imageUrl) {
+    return res.status(422).json({ message: "No Image Provided" });
+  }
   try {
     const product = await Product.findByPk(productId);
     let updatedProduct;
@@ -220,7 +234,7 @@ const updateProduct = async function (
       product.description = description;
       product.price = price;
       product.quantity = quantity;
-    
+
       let catId = await Product_Category.findOne({
         where: {
           name: catName,
@@ -242,7 +256,11 @@ const updateProduct = async function (
   }
 };
 
-const deleteProduct = async function (req: Request, res: Response, next: NextFunction) {
+const deleteProduct = async function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   const prodId = req.params.id;
   if (!req.isAuth) {
     return res.status(401).json({ message: "Unauthorized" });
@@ -257,15 +275,18 @@ const deleteProduct = async function (req: Request, res: Response, next: NextFun
       return res.status(404).json({ message: "Product Not Found" });
     }
     if (product.UserId.toString() === req.userId.toString()) {
-      // return res.status(401).json({ message: "You should be the admin" });
-     product.destroy().then(success =>{
-      res.status(200).json({
-        message: "Product deleted",
-      });
-     }).catch(err=>{
-      next(err);
-     });
-      
+      let imagePath = product.imageUrl;
+      product
+        .destroy()
+        .then((success) => {
+          clearImage(imagePath);
+          res.status(200).json({
+            message: "Product deleted",
+          });
+        })
+        .catch((err) => {
+          next(err);
+        });
     }
   } catch (error) {
     next(error);
@@ -279,4 +300,10 @@ export {
   updateProduct,
   deleteCategory,
   deleteProduct,
+};
+import path from "path";
+import fs from 'fs';
+const clearImage = (filePath:string) => {
+  filePath = path.join(__dirname, "../../", filePath);
+  fs.unlink(filePath, (err) => console.log(err));
 };

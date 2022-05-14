@@ -10,7 +10,6 @@ router.post(
   "/create-category",
   [
     body("name").not().isEmpty().trim(),
-    body("imageUrl").not().isEmpty().trim(),
     body("description").not().isEmpty().trim(),
   ],
   createCategory
@@ -19,7 +18,6 @@ router.post(
   "/create-product",
   [
     body("name").not().isEmpty().trim(),
-    body("imageUrl").not().isEmpty().trim(),
     body("description").not().isEmpty().trim(),
     body("price").isNumeric().not().isEmpty(),
     body("quantity").isNumeric().not().isEmpty(),
@@ -29,11 +27,11 @@ router.post(
 );
 
 router.put("/update-category/:id"
-, [
-  body("name").not().isEmpty().trim(),
-  body("imageUrl").not().isEmpty().trim(),
-  body("description").not().isEmpty().trim(),
-]
+// , [
+//   body("name").not().isEmpty().trim(),
+//   body("imageUrl").not().isEmpty().trim(),
+//   body("description").not().isEmpty().trim(),
+// ]
 ,updateCategory);
 
 router.put("/update-product/:id", [
