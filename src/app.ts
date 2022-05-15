@@ -16,6 +16,12 @@ import multer from "multer";
 import fs from "fs";
 import path from "path";
 const { v4: uuidv4 } = require('uuid');
+import { graphqlHTTP } from 'express-graphql';
+import schema from './graphql/schema';
+//const graphqlResolver = require('./graphql/resolver');
+import graphqlResolver from './graphql/resolver';
+
+
 
 require("dotenv").config();
 
@@ -84,6 +90,15 @@ app.use((error: any, req: any, res: any, next: any) => {
     message: message,
   });
 });
+
+// app.use('/graphql',graphqlHTTP({
+//   schema:schema,
+//   rootValue:graphqlResolver,
+//   graphiql:true
+// }))
+
+
+
 
 /// create tables and its relationships MySql;
 Users.hasOne(Cart);
