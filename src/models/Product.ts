@@ -15,7 +15,7 @@ import { DataTypes } from "sequelize";
 import sequelize from "../utils/database";
 import { Users } from "./Users";
 import { Product_Category } from "./Product_Category";
-import { Field, ID, Int, ObjectType } from "type-graphql";
+import { ArgsType, Field, ID, Int, ObjectType } from "type-graphql";
 import { type } from "os";
 
 @Table
@@ -66,3 +66,4 @@ export class Product extends Model {
   @Column(DataTypes.INTEGER)
   ProductCategoryId!: number |undefined
 }
+

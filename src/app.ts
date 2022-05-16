@@ -15,27 +15,24 @@ import { isAuth } from "./middleware/isAuth";
 import multer from "multer";
 import fs from "fs";
 import path from "path";
-const { v4: uuidv4 } = require('uuid');
-import { graphqlHTTP } from 'express-graphql';
-import schema from './graphql/schema';
+const { v4: uuidv4 } = require("uuid");
+import { graphqlHTTP } from "express-graphql";
+// import schema from "./graphql/schema";
 //const graphqlResolver = require('./graphql/resolver');
-import graphqlResolver from './graphql/resolver';
+// import graphqlResolver from "./graphql/resolver";
+import { buildSchema } from "type-graphql";
+import { ProductResolver } from "./graphqlResolvers/ProductResolver";
 
 
-
-require("dotenv").config();
-
-const app = express();
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    fs.mkdir(path.join(__dirname,'..', "images"), () => {
+    fs.mkdir(path.join(__dirname, "..", "images"), () => {
       //console.log(path.join(__dirname,'..', "images"))
       cb(null, "images");
     });
   },
   filename: (req, file, cb) => {
-   
     cb(null, uuidv4() + "-" + file.originalname);
   },
 });
@@ -56,50 +53,6 @@ const fileFilter = (
   }
 };
 
-app.use(bodyParser.json());
-
-app.use(
-  multer({
-    storage: fileStorage,
-    fileFilter: fileFilter,
-  }).single("imageUrl")
-);
-
-app.use(
-  express.urlencoded({
-    extended: false,
-  })
-);
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  next();
-});
-
-app.use(isAuth);
-//register routes for the REST Api
-app.use("/auth", authRoute);
-
-app.use("/admin", adminRoute);
-
-app.use((error: any, req: any, res: any, next: any) => {
-  const status = error.statusCode || 500;
-  const message = error.message;
-  res.status(status).json({
-    message: message,
-  });
-});
-
-// app.use('/graphql',graphqlHTTP({
-//   schema:schema,
-//   rootValue:graphqlResolver,
-//   graphiql:true
-// }))
-
-
-
-
 /// create tables and its relationships MySql;
 Users.hasOne(Cart);
 Cart.belongsTo(Users);
@@ -114,17 +67,71 @@ Users.hasMany(Order);
 Order.belongsTo(Users);
 Order.belongsToMany(Product, { through: Order_Item });
 Order.hasOne(Payment_Details);
+async function run() {
+  require("dotenv").config();
+  const app = express();
 
-sequelize
-  // .sync({ force: true })
-  .sync()
-  .then((res) => {
-    //console.log(res);
-    console.log("Connection has been established successfully.");
-    app.listen(process.env.APPLICATION_PORT, () => {
-      console.log(`Litening on port  ${process.env.APPLICATION_PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.error("Unable to connect to the database:", err);
+  app.use(bodyParser.json());
+
+  app.use(
+    multer({
+      storage: fileStorage,
+      fileFilter: fileFilter,
+    }).single("imageUrl")
+  );
+
+  app.use(
+    express.urlencoded({
+      extended: false,
+    })
+  );
+  app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE");
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization"
+    );
+    next();
   });
+
+  app.use(isAuth);
+  //register routes for the REST Api
+  app.use("/auth", authRoute);
+
+  app.use("/admin", adminRoute);
+
+  app.use((error: any, req: any, res: any, next: any) => {
+    const status = error.statusCode || 500;
+    const message = error.message;
+    res.status(status).json({
+      message: message,
+    });
+  });
+
+  const schema = await buildSchema({
+    resolvers: [ProductResolver],
+    emitSchemaFile: true,
+  });
+  app.use(
+    "/graphql",
+    graphqlHTTP({
+      schema: schema,
+      graphiql: true,
+    })
+  );
+  sequelize
+    // .sync({ force: true })
+    .sync()
+    .then((res) => {
+      //console.log(res);
+      console.log("Connection has been established successfully.");
+      app.listen(process.env.APPLICATION_PORT, () => {
+        console.log(`Litening on port  ${process.env.APPLICATION_PORT}`);
+      });
+    })
+    .catch((err) => {
+      console.error("Unable to connect to the database:", err);
+    });
+}
+run();
