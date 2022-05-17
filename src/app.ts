@@ -22,8 +22,9 @@ import { graphqlHTTP } from "express-graphql";
 // import graphqlResolver from "./graphql/resolver";
 import { buildSchema } from "type-graphql";
 import { ProductResolver } from "./graphqlResolvers/ProductResolver";
-
-
+import { ProductCategoryResolver } from "./graphqlResolvers/CategoryResolver";
+import { CartResolver } from "./graphqlResolvers/CartResolver";
+import { CartData } from "./graphqlResolvers/Inputs/inputProduct";
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -110,14 +111,18 @@ async function run() {
   });
 
   const schema = await buildSchema({
-    resolvers: [ProductResolver],
+    resolvers: [ProductResolver, ProductCategoryResolver, CartResolver],
     emitSchemaFile: true,
+    // orphanedTypes:[CartData]
   });
   app.use(
     "/graphql",
-    graphqlHTTP({
-      schema: schema,
+    graphqlHTTP((req, res, graphQLParams)=>
+    {
+     return { schema: schema,
       graphiql: true,
+      context:{ req},
+     }
     })
   );
   sequelize

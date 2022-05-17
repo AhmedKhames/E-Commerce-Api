@@ -3,6 +3,33 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+type CartData {
+  cartProduct: [CartProduct!]!
+  totalSum: Float!
+}
+
+type CartProduct {
+  description: String!
+  imageUrl: String!
+  name: String!
+  price: Float!
+  productId: Float!
+  quantity: Float!
+  seller: String!
+}
+
+type Cart_item {
+  CartId: Float!
+  ProductId: Float!
+  id: ID!
+  quantity: Float!
+}
+
+type Mutation {
+  addToCart(product: Float!): Cart_item!
+  deleteFromCart(prodId: Float!): Boolean!
+}
+
 type Product {
   ProductCategoryId: Int!
   UserId: Float!
@@ -14,7 +41,18 @@ type Product {
   quantity: Float!
 }
 
+type Product_Category {
+  UserId: Float!
+  description: String!
+  id: ID!
+  imageUrl: String!
+  name: String!
+}
+
 type Query {
+  getAllProductCategories(page: Float = 1): [Product_Category!]!
   getAllProducts(page: Float = 1): [Product!]!
+  getCartItems: CartData!
   getProduct(prodId: Float!): Product!
+  getProductCategory(prodId: Float!): Product_Category!
 }

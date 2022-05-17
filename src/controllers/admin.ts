@@ -287,6 +287,10 @@ const deleteProduct = async function (
         .catch((err) => {
           next(err);
         });
+    }else{
+      res.status(422).json({
+        message : "you aren't admin"
+      })
     }
   } catch (error) {
     next(error);

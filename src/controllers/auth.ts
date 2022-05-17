@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import { constants } from "fs";
 import jwt, { Jwt } from "jsonwebtoken";
 import { isAuth } from "../middleware/isAuth";
+import { Cart } from "../models/Cart";
 
 require("dotenv").config();
 
@@ -18,9 +19,6 @@ interface BodyData {
 
 const signup = (req: express.Request, res: express.Response, next: any) => {
   
-  // if (!req.isAuth) {
-  //   return res.status(401).json({ message :"Unauthorized" });
-  // }
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -46,10 +44,14 @@ const signup = (req: express.Request, res: express.Response, next: any) => {
       return user;
     })
     .then((result) => {
-      res.status(201).json({
-        message: "User created",
-        userId: result.id,
-      });
+      Cart.create({
+        UserId:result.id
+      }).then(createdUser=>{
+        res.status(201).json({
+          message: "User created",
+          userId: createdUser.UserId,
+        });
+      })
     })
     .catch((err) => {
       console.log(err);

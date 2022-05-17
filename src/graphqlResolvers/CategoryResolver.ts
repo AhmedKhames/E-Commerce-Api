@@ -1,26 +1,26 @@
 import { Arg, Args, Ctx, Query, Resolver } from "type-graphql";
 import { SessionCtx } from "../helperTypes/Session";
-import { Product } from "../models/Product";
+import { Product_Category } from "../models/Product_Category";
 
-@Resolver((of) => Product)
-export class ProductResolver {
-  @Query((returns) => [Product])
-  async getAllProducts(
+@Resolver((of) => Product_Category)
+export class ProductCategoryResolver {
+  @Query((returns) => [Product_Category])
+  async getAllProductCategories(
     @Arg("page", { defaultValue: 1 }) page: number
-  ): Promise<Product[]> {
+  ): Promise<Product_Category[]> {
     let perPage = 2;
-    return Product.findAll({
+    return Product_Category.findAll({
       limit: perPage,
       offset: (page - 1) * perPage,
     });
   }
 
-  @Query((returns) => Product)
-  async getProduct(
+  @Query((returns) => Product_Category)
+  async getProductCategory(
     @Arg("prodId") productId: number,
-    @Ctx() context: SessionCtx
-  ): Promise<Product | null> {
-    let product = await Product.findByPk(productId);
+    
+  ): Promise<Product_Category | null> {
+    let product = await Product_Category.findByPk(productId);
     if (product) {
       return product;
     } else {
