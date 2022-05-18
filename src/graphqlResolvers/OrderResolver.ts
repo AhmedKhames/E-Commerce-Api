@@ -9,7 +9,7 @@ import { Product } from "../models/Product";
 import { UserAddresses } from "../models/UserAddresses";
 import { UserPhones } from "../models/UserPhones";
 import { Users } from "../models/Users";
-import { CartData, CartProduct } from "./Inputs/inputProduct";
+import { CartData, CartProduct, OrderData } from "./Inputs/inputProduct";
 
 @Resolver()
 export class OrderResolver {
@@ -106,5 +106,114 @@ export class OrderResolver {
     }
   }
 
-    // @Query(returns=>)
+  @Query((returns) => OrderData)
+  async getOrderItems(
+    @Arg("orderId") orderId: number,
+    @Ctx() context: SessionCtx
+  ): Promise<OrderData> {
+    if (!context.req.isAuth) {
+      return Promise.reject("You Must log in");
+    }
+
+    let order = await Order.findOne({
+      where: { [Op.and]: [{ id: orderId }, { UserId: context.req.userId }] },
+    });
+    let orderProducts: CartProduct[] = [];
+    if (order) {
+      let orderItem = await Order_Item.findAll({
+        where: { OrderId: order.id },
+      });
+      let address = order.address,
+        phoneNumber = order.phoneNumber;
+      let total: number = +order.total;
+
+      for (const item of orderItem) {
+        let product = await Product.findOne({ where: { id: item.ProductId } });
+        if (product) {
+          let seller = await Users.findOne({ where: { id: product.UserId } });
+
+          let orderProduct = {
+            name: product.name,
+            imageUrl: product.imageUrl,
+            description: product.description,
+            productId: product.id,
+            price: product.price,
+            quantity: item.quantity,
+            seller: seller!.name,
+          };
+          orderProducts.push(orderProduct);
+        }
+      }
+      let orderData: OrderData = {
+        address: address,
+        cartProduct: orderProducts,
+        phoneNumber: phoneNumber,
+        totalSum: total,
+        orderId:orderId
+      };
+      return orderData;
+    } else {
+      throw new Error("No Order found");
+    }
+  }
+
+  @Query((returns) => [OrderData])
+  async getOrdersHistory(@Ctx() context: SessionCtx): Promise<OrderData[]> {
+    if (!context.req.isAuth) {
+      return Promise.reject("You Must log in");
+    }
+
+    let orders = await Order.findAll({
+      where: { [Op.and]: [{ UserId: context.req.userId }] },
+    });
+    
+    let allOrders: OrderData[] = [];
+    if (orders.length > 0) {
+      
+      for (const order of orders) {
+        let orderProducts: CartProduct[] = [];
+        let orderItem = await Order_Item.findAll({
+          where: { OrderId: order.id },
+        });
+        let address = order.address,
+          phoneNumber = order.phoneNumber;
+        let total: number = +order.total;
+        if (orderItem.length > 0) {
+          
+        
+        for (const item of orderItem) {
+          let product = await Product.findOne({
+            where: { id: item.ProductId },
+          });
+          if (product) {
+            let seller = await Users.findOne({ where: { id: product.UserId } });
+
+            let orderProduct = {
+              name: product.name,
+              imageUrl: product.imageUrl,
+              description: product.description,
+              productId: product.id,
+              price: product.price,
+              quantity: item.quantity,
+              seller: seller!.name,
+            };
+            orderProducts.push(orderProduct);
+          }
+        }
+      
+        let orderData: OrderData = {
+          address: address,
+          cartProduct: orderProducts,
+          phoneNumber: phoneNumber,
+          totalSum: total,
+          orderId:order.id
+        };
+        allOrders.push(orderData);
+      }
+      }
+      return allOrders;
+    } else {
+      throw new Error("No Orders found");
+    }
+  }
 }

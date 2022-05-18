@@ -8,10 +8,12 @@ import {
     PrimaryKey,
     NotNull,
     AllowNull,
+    ForeignKey,
   } from "sequelize-typescript";
   import { DataTypes } from "sequelize";
   
   import sequelize from "../utils/database";
+import { Product } from "./Product";
   
   @Table
   export class Order_Item extends Model {
@@ -22,5 +24,10 @@ import {
 
     @Column(DataTypes.INTEGER)
     quantity!: number;
+
+    @AllowNull(true)
+    @ForeignKey(() => Product)
+    @Column(DataTypes.INTEGER)
+    ProductId!: number;
   }
   

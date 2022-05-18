@@ -39,6 +39,14 @@ type Order {
   total: String!
 }
 
+type OrderData {
+  address: String!
+  cartProduct: [CartProduct!]!
+  orderId: ID!
+  phoneNumber: String!
+  totalSum: Float!
+}
+
 type Product {
   ProductCategoryId: Int!
   UserId: Float!
@@ -62,6 +70,8 @@ type Query {
   getAllProductCategories(page: Float = 1): [Product_Category!]!
   getAllProducts(page: Float = 1): [Product!]!
   getCartItems: CartData!
+  getOrderItems(orderId: Float!): OrderData!
+  getOrdersHistory: [OrderData!]!
   getProduct(prodId: Float!): Product!
   getProductCategory(prodId: Float!): Product_Category!
 }

@@ -1,4 +1,5 @@
-import { Field, InputType, ObjectType } from "type-graphql";
+import { type } from "os";
+import { Field, ID, InputType, ObjectType } from "type-graphql";
 import { Users } from "../../models/Users";
 
 @ObjectType()
@@ -46,6 +47,10 @@ export class CartData{
 
 @ObjectType()
 export class OrderData{
+
+    @Field(type=>ID)
+    orderId!:number
+
     @Field(type => [CartProduct])
     cartProduct!: CartProduct[];
     
