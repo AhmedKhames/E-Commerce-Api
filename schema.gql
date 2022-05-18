@@ -26,8 +26,17 @@ type Cart_item {
 }
 
 type Mutation {
+  addOrder(address: String = "", cart: Float!, phoneNumber: String = ""): Order!
   addToCart(product: Float!): Cart_item!
   deleteFromCart(prodId: Float!): Boolean!
+}
+
+type Order {
+  UserId: Float!
+  address: String!
+  id: ID!
+  phoneNumber: String!
+  total: String!
 }
 
 type Product {

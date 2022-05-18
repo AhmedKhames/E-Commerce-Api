@@ -8,12 +8,10 @@ import {
   PrimaryKey,
   NotNull,
   AllowNull,
+  ForeignKey,
 } from "sequelize-typescript";
 import { DataTypes } from "sequelize";
-// import { HasManyGetAssociationsMixin, HasManyAddAssociationMixin, HasManyHasAssociationMixin, Association, HasManyCountAssociationsMixin, HasManyCreateAssociationMixin } from 'sequelize';
 
-import sequelize from "../utils/database";
-import { Product_Category } from "./Product_Category";
 
 @Table
 export class Users extends Model {
@@ -35,16 +33,14 @@ export class Users extends Model {
   email!: string;
 
   @AllowNull(true)
-  @Column(DataTypes.STRING)
-  address!: string;
+  // @ForeignKey(() => Users)
+  @Column(DataTypes.INTEGER)
+  addressId!: number;
 
   @AllowNull(true)
-  @Column(DataTypes.STRING)
-  phoneNumber!: string;
-
-  // public createProduct_Category?:HasManyGetAssociationsMixin<Product_Category> ;
-
-
+  // @ForeignKey(() => Users)
+  @Column(DataTypes.INTEGER)
+  phoneNumberId!: number;
 
 
 }

@@ -42,3 +42,19 @@ export class CartData{
     @Field({nullable:false})
     totalSum!:number
 }
+
+
+@ObjectType()
+export class OrderData{
+    @Field(type => [CartProduct])
+    cartProduct!: CartProduct[];
+    
+    @Field({nullable:false})
+    totalSum!:number
+
+    @Field({nullable:false})
+    address!:string
+
+    @Field({nullable:false})
+    phoneNumber!:string
+}

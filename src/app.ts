@@ -25,6 +25,9 @@ import { ProductResolver } from "./graphqlResolvers/ProductResolver";
 import { ProductCategoryResolver } from "./graphqlResolvers/CategoryResolver";
 import { CartResolver } from "./graphqlResolvers/CartResolver";
 import { CartData } from "./graphqlResolvers/Inputs/inputProduct";
+import { UserPhones } from "./models/UserPhones";
+import { UserAddresses } from "./models/UserAddresses";
+import { OrderResolver } from "./graphqlResolvers/OrderResolver";
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -57,6 +60,10 @@ const fileFilter = (
 /// create tables and its relationships MySql;
 Users.hasOne(Cart);
 Cart.belongsTo(Users);
+Users.hasMany(UserAddresses);
+UserAddresses.belongsTo(Users)
+Users.hasMany(UserPhones);
+UserPhones.belongsTo(Users)
 Product.belongsTo(Users, { constraints: true, onDelete: "CASCADE" });
 Users.hasMany(Product);
 Users.hasMany(Product_Category);
@@ -111,7 +118,7 @@ async function run() {
   });
 
   const schema = await buildSchema({
-    resolvers: [ProductResolver, ProductCategoryResolver, CartResolver],
+    resolvers: [ProductResolver, ProductCategoryResolver, CartResolver,OrderResolver],
     emitSchemaFile: true,
     // orphanedTypes:[CartData]
   });

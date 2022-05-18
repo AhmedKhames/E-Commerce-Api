@@ -84,7 +84,7 @@ export class CartResolver {
     };
   }
 
-  // deletePost(id:ID!) : Boolean
+
 
   @Mutation((returns) => Boolean)
   async deleteFromCart(
