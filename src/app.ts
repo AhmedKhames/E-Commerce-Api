@@ -28,6 +28,7 @@ import { CartData } from "./graphqlResolvers/Inputs/inputProduct";
 import { UserPhones } from "./models/UserPhones";
 import { UserAddresses } from "./models/UserAddresses";
 import { OrderResolver } from "./graphqlResolvers/OrderResolver";
+import { PayType } from "./models/PayType";
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -75,6 +76,10 @@ Users.hasMany(Order);
 Order.belongsTo(Users);
 Order.belongsToMany(Product, { through: Order_Item });
 Order.hasOne(Payment_Details);
+// Payment_Details.hasOne(PayType);
+// PayType.belongsTo(Payment_Details);
+
+
 async function run() {
   require("dotenv").config();
   const app = express();
@@ -133,7 +138,18 @@ async function run() {
     })
   );
   sequelize
-    // .sync({ force: true })
+    //  .sync({ alter: true })
+    // .then(data =>{
+    //   PayType.bulkCreate([{type:'COD'},{type:'CARD'}]).then(sucess=>{
+    //     console.log("Connection has been established successfully.");
+    //     app.listen(process.env.APPLICATION_PORT, () => {
+    //       console.log(`Litening on port  ${process.env.APPLICATION_PORT}`);
+    //     });
+    //   }).catch((err) => {
+    //     console.error("Unable to connect to the database:", err);
+    //   });
+    // })
+  
     .sync()
     .then((res) => {
       //console.log(res);

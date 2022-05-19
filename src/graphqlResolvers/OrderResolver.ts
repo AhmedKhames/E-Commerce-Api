@@ -5,6 +5,8 @@ import { Cart } from "../models/Cart";
 import { Cart_item } from "../models/Cart_item";
 import { Order } from "../models/Order";
 import { Order_Item } from "../models/Order_Item";
+import { Payment_Details } from "../models/Payment_Details";
+import { PayType } from "../models/PayType";
 import { Product } from "../models/Product";
 import { UserAddresses } from "../models/UserAddresses";
 import { UserPhones } from "../models/UserPhones";
@@ -18,10 +20,11 @@ export class OrderResolver {
     @Arg("cart") cartId: number,
     @Arg("address", { defaultValue: "" }) address: string,
     @Arg("phoneNumber", { defaultValue: "" }) phoneNumber: string,
+    @Arg("payType") payType: string,
     @Ctx() context: SessionCtx
   ): Promise<Order> {
     if (!context.req.isAuth) {
-      return Promise.reject("You Must log in");
+      throw new Error("You Must log in");
     }
     let userId = context.req.userId;
     let cart = await Cart.findOne({ where: { id: cartId } });
@@ -30,7 +33,7 @@ export class OrderResolver {
 
     if (cartItems.length !== 0) {
       if (cart?.UserId.toString() !== context.req.userId.toString()) {
-        return Promise.reject("Not your cart");
+        throw new Error("Not your cart");
       }
       let user = await Users.findOne({ where: { id: cart.UserId.toString() } });
       let addresses;
@@ -95,14 +98,30 @@ export class OrderResolver {
           ProductId: prodId,
         });
       }
-      let orderItems = await Order_Item.bulkCreate(orders);
+      // let orderItems = await Order_Item.bulkCreate(orders);
+
+      if (payType === "COD") {
+        await Order_Item.bulkCreate(orders);
+        let paymentType = await PayType.findOne({ type: payType });
+        if (paymentType) {
+          await Payment_Details.create({
+            amount: order.total,
+            pay_type: paymentType.id,
+            OrderId:order.id
+          });
+        }
+        
+      } else if (payType === "CARD") {
+        // to create stripe customer we need 
+        // 1 - email 2 - name  3 - token that generated from card number and CVC 
+      }
 
       cartItems.forEach((item) => {
         item.destroy();
       });
       return order;
     } else {
-      return Promise.reject("The cart is empty");
+      throw new Error("The cart is empty");
     }
   }
 
@@ -149,7 +168,7 @@ export class OrderResolver {
         cartProduct: orderProducts,
         phoneNumber: phoneNumber,
         totalSum: total,
-        orderId:orderId
+        orderId: orderId,
       };
       return orderData;
     } else {
@@ -166,10 +185,9 @@ export class OrderResolver {
     let orders = await Order.findAll({
       where: { [Op.and]: [{ UserId: context.req.userId }] },
     });
-    
+
     let allOrders: OrderData[] = [];
     if (orders.length > 0) {
-      
       for (const order of orders) {
         let orderProducts: CartProduct[] = [];
         let orderItem = await Order_Item.findAll({
@@ -179,37 +197,37 @@ export class OrderResolver {
           phoneNumber = order.phoneNumber;
         let total: number = +order.total;
         if (orderItem.length > 0) {
-          
-        
-        for (const item of orderItem) {
-          let product = await Product.findOne({
-            where: { id: item.ProductId },
-          });
-          if (product) {
-            let seller = await Users.findOne({ where: { id: product.UserId } });
+          for (const item of orderItem) {
+            let product = await Product.findOne({
+              where: { id: item.ProductId },
+            });
+            if (product) {
+              let seller = await Users.findOne({
+                where: { id: product.UserId },
+              });
 
-            let orderProduct = {
-              name: product.name,
-              imageUrl: product.imageUrl,
-              description: product.description,
-              productId: product.id,
-              price: product.price,
-              quantity: item.quantity,
-              seller: seller!.name,
-            };
-            orderProducts.push(orderProduct);
+              let orderProduct = {
+                name: product.name,
+                imageUrl: product.imageUrl,
+                description: product.description,
+                productId: product.id,
+                price: product.price,
+                quantity: item.quantity,
+                seller: seller!.name,
+              };
+              orderProducts.push(orderProduct);
+            }
           }
+
+          let orderData: OrderData = {
+            address: address,
+            cartProduct: orderProducts,
+            phoneNumber: phoneNumber,
+            totalSum: total,
+            orderId: order.id,
+          };
+          allOrders.push(orderData);
         }
-      
-        let orderData: OrderData = {
-          address: address,
-          cartProduct: orderProducts,
-          phoneNumber: phoneNumber,
-          totalSum: total,
-          orderId:order.id
-        };
-        allOrders.push(orderData);
-      }
       }
       return allOrders;
     } else {

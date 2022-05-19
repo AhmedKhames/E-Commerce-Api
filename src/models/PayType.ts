@@ -12,23 +12,16 @@ import {
 } from "sequelize-typescript";
 import { DataTypes } from "sequelize";
 
-import sequelize from "../utils/database";
-import { PayType } from "./PayType";
-
 @Table
-export class Payment_Details extends Model {
+export class PayType extends Model {
   @AutoIncrement
   @PrimaryKey
   @Column(DataTypes.INTEGER)
   id!: number;
 
   @AllowNull(false)
-  @Column(DataTypes.INTEGER)
-  amount!: number;
+  @Column(DataTypes.STRING)
+  type!: string;
 
-  @AllowNull(false)
-  @ForeignKey(() => PayType)
-  @Column(DataTypes.INTEGER)
-  pay_type!: number;
- 
+  
 }
