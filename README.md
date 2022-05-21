@@ -13,5 +13,6 @@ A REST and GraphQl ecommerce Api using NodeJs , TypeScript , express.js and MySq
 > 1. npm install
 > 2. Modify the .env file with your configurations 
 
-
+## Postman Run
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/18bf7db2a96fc22a5455?action=collection%2Fimport)
 
