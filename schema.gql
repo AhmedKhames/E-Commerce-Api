@@ -3,6 +3,13 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+input CardInput {
+  cardCVC: String!
+  cardExpDate: Float!
+  cardExpYear: Float!
+  cardNumber: String!
+}
+
 type CartData {
   cartProduct: [CartProduct!]!
   totalSum: Float!
@@ -27,6 +34,7 @@ type Cart_item {
 
 type Mutation {
   addOrder(address: String = "", cart: Float!, payType: String!, phoneNumber: String = ""): Order!
+  addOrderUsingCard(address: String = "", cardInfo: CardInput!, cart: Float!, phoneNumber: String = ""): Order!
   addToCart(product: Float!): Cart_item!
   deleteFromCart(prodId: Float!): Boolean!
 }
