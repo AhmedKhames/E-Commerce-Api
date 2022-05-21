@@ -15,14 +15,20 @@ A REST and GraphQl ecommerce Api using NodeJs , TypeScript , express.js and MySq
 
 ## Endpoints
 * REST API
-    * Sign up - {Base Url}/auth/signup
-    * Login - {Base Url}/auth/login
-    * Create category - {Base Url}/admin/create-category
-    * Update category - {Base Url}/admin/update-category/{categoryId}
-    * Delete category - {Base Url}/admin/delete-category/{categoryId}
-    * Create product - {Base Url}/admin/create-product
-    * Update product - {Base Url}/admin/update-product/{productId}
-    * Delete product - {Base Url}/admin/delete-product/{productId}
+
+
+    | Endpoint    | HTTP Method | Usage | Returns | Require Authentication |
+    | :----------: |:-----------:|:-------:|:--------:|:----------:|
+    |/auth/signup | PUT| accept email, name, password,address and phone number of the user | user Id | NO |
+    | /auth/login | POST | accept email and password | the JWT token| NO |
+    | /admin/create-category | POST | accept name ,description and image for a category | the created product information | YES |
+    | /admin/update-category/{categoryId} | PUT | accept categoryId as parameter and the field which will updated in the body | the updated category | YES |    
+    |/admin/delete-category/{categoryId} | DELETE |categoryId as parameter | success or fail deletion | YES
+    |/admin/create-product |POST|accept name ,description , image,price and quantity for a product|the creted product|YES|
+    |/admin/update-product/{productId}|PUT|accept productId as parameter and the field which will updated in the body|the updated product|YES|
+    |/admin/delete-product/{productId}|DELETE|productId as parameter | success or fail deletion |YES|
+
+
 
 * GraphQl [The Schema](https://github.com/AhmedKhames/E-Commerce-Api/blob/master/schema.gql)
     * Mutations
