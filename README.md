@@ -16,7 +16,6 @@ A REST and GraphQl ecommerce Api using NodeJs , TypeScript , express.js and MySq
 ## Endpoints
 * REST API
 
-
     | Endpoint    | HTTP Method | Usage | Returns | Require Authentication |
     | :----------: |:-----------:|:-------:|:--------:|:----------:|
     |/auth/signup | PUT| accept email, name, password,address and phone number of the user | user Id | NO |
@@ -29,38 +28,25 @@ A REST and GraphQl ecommerce Api using NodeJs , TypeScript , express.js and MySq
     |/admin/delete-product/{productId}|DELETE|productId as parameter | success or fail deletion |YES|
 
 
+* GraphQL [The Schema](https://github.com/AhmedKhames/E-Commerce-Api/blob/master/schema.gql)
+1. Mutations
 
-* GraphQl [The Schema](https://github.com/AhmedKhames/E-Commerce-Api/blob/master/schema.gql)
-    * Mutations
-        * add product to cart
-            > addToCart(product: Float!): Cart_item!
-        * delete from cart 
-            > deleteFromCart(prodId: Float!): Boolean!
-        * place order using cash on delivery option 
-            >   addOrder(address: String = "", cart: Float!, payType: String!, phoneNumber: String = ""): Order!
-        * place order using bank card 
-            >   addOrderUsingCard(address: String = "", cardInfo: CardInput!, cart: Float!, phoneNumber: String = ""): Order!
-    * Queries
-        * get all products using pagination 
-            >  getAllProducts(page: Float = 1): [Product!]!
-        * get all categories  using pagination 
-            > getAllProductCategories(page: Float = 1): [Product_Category!]!
-        
-        * get one product by id 
-            >  getProduct(prodId: Float!): Product!
-        * get one category by id  
-            > getProductCategory(prodId: Float!): Product_Category!  
-        * get cart items 
-            > getCartItems: CartData!
-        * get order items
-            > getOrderItems(orderId: Float!): OrderData!
-        * get orders history
-            > getOrdersHistory: [OrderData!]!
+| Function    | Usage | 
+| :----------: |:-----------:|
+|add product to cart|addToCart(product: Float!): Cart_item!|
+|delete from cart |deleteFromCart(prodId: Float!): Boolean!|
+|place order using cash on delivery option |addOrder(address: String = "", cart: Float!, payType: String!, phoneNumber: String = ""): Order!|
+|place order using bank card |addOrderUsingCard(address: String = "", cardInfo: CardInput!, cart: Float!, phoneNumber: String = ""): Order!|
+  
+ 2. Queries
 
-
-
-
-
-    
+| Function    | Usage | 
+| :----------: |:-----------:|
+|get all products using pagination |getAllProducts(page: Float = 1): [Product!]!|
+|get all categories using pagination |getAllProductCategories(page: Float = 1): [Product_Category!]!|
+|get one product by id |getProduct(prodId: Float!): Product!|
+|get one category by id  |getProductCategory(prodId: Float!): Product_Category!|
+|get cart items |getCartItems: CartData!|
+|get order items|getOrderItems(orderId: Float!): OrderData!|
+|get orders history|getOrdersHistory: [OrderData!]!| 
  
-
