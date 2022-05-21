@@ -74,12 +74,12 @@ const updateCategory = async function (
   const description = body.description;
 
   if (req.file) {
-    clearImage(body.imageUrl);
+    //clearImage(body.imageUrl);
     imageUrl = req.file.path.replace("\\", "/");
   }
-  if (!imageUrl) {
-    return res.status(422).json({ message: "No Image Provided" });
-  }
+  // if (!imageUrl) {
+  //   return res.status(422).json({ message: "No Image Provided" });
+  // }
   try {
     const productCat = await Product_Category.findByPk(catId);
     let updatedCat;
