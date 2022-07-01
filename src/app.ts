@@ -17,9 +17,6 @@ import fs from "fs";
 import path from "path";
 const { v4: uuidv4 } = require("uuid");
 import { graphqlHTTP } from "express-graphql";
-// import schema from "./graphql/schema";
-//const graphqlResolver = require('./graphql/resolver');
-// import graphqlResolver from "./graphql/resolver";
 import { buildSchema } from "type-graphql";
 import { ProductResolver } from "./graphqlResolvers/ProductResolver";
 import { ProductCategoryResolver } from "./graphqlResolvers/CategoryResolver";
@@ -84,8 +81,11 @@ async function run() {
   require("dotenv").config();
   const app = express();
 
+  // to parse JSON requests application/json
   app.use(bodyParser.json());
 
+
+  // to handle multipart request {image upload}
   app.use(
     multer({
       storage: fileStorage,
@@ -93,27 +93,28 @@ async function run() {
     }).single("imageUrl")
   );
 
-  app.use(
-    express.urlencoded({
-      extended: false,
-    })
-  );
+  // app.use(
+  //   express.urlencoded({
+  //     extended: false,
+  //   })
+  // );
+
   app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE");
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization"
-    );
+    res.setHeader("Access-Control-Allow-Headers","Content-Type, Authorization");
     next();
   });
 
+  // Authorization middleware 
   app.use(isAuth);
   //register routes for the REST Api
+  // authentication route
   app.use("/auth", authRoute);
-
+  // admin routes to add , delete and update categories and products  
   app.use("/admin", adminRoute);
 
+  // error handling middleware
   app.use((error: any, req: any, res: any, next: any) => {
     const status = error.statusCode || 500;
     const message = error.message;

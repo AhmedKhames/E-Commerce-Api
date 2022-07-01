@@ -74,44 +74,6 @@ const signup = async function (
     });
   }
 
-  // bcrypt
-  //   .hash(password, 12)
-  //   .then((hashedPassword) => {
-  //     const user =  Users.create({
-  //       name: name,
-  //       password: hashedPassword,
-  //       email: email,
-  //     })
-  //     // .then(userUp=>{
-  //     //   if (address) {
-  //     //     const addresses = UserAddresses.create({
-  //     //       address:address,
-  //     //       UserId:userUp.id
-  //     //     })
-  //     //   }
-  //     //   if (phoneNumber) {
-
-  //     //   }
-  //     // });
-
-  //     return user;
-  //   })
-  //   .then((result) => {
-  //     Cart.create({
-  //       UserId:result.id
-  //     }).then(createdUser=>{
-  //       res.status(201).json({
-  //         message: "User created",
-  //         userId: createdUser.UserId,
-  //       });
-  //     })
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //     res.status(500).json({
-  //       message: "creation error",
-  //     });
-  //   });
 };
 
 const login = (req: express.Request, res: express.Response, next: any) => {
