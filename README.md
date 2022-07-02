@@ -6,7 +6,7 @@ A REST and GraphQl ecommerce Api using NodeJs , TypeScript , express.js and MySq
 * User Authentication
 * Adding ,deleting and updating category and product
 * Shopping Cart 
-* Order placement with card or cash on delivery payment options
+* Order placement with card payment options
 
 ## Getting Started
 ### Installation 
@@ -35,7 +35,6 @@ A REST and GraphQl ecommerce Api using NodeJs , TypeScript , express.js and MySq
 | :----------: |:-----------:|
 |add product to cart|addToCart(product: Float!): Cart_item!|
 |delete from cart |deleteFromCart(prodId: Float!): Boolean!|
-|place order using cash on delivery option |addOrder(address: String = "", cart: Float!, payType: String!, phoneNumber: String = ""): Order!|
 |place order using bank card |addOrderUsingCard(address: String = "", cardInfo: CardInput!, cart: Float!, phoneNumber: String = ""): Order!|
   
 2. Queries
@@ -50,6 +49,10 @@ A REST and GraphQl ecommerce Api using NodeJs , TypeScript , express.js and MySq
 |get order items|getOrderItems(orderId: Float!): OrderData!|
 |get orders history|getOrdersHistory: [OrderData!]!| 
   
+
+## Database design
+
+![alt text](https://github.com/AhmedKhames/E-Commerce-Api/blob/refactoring/ecommerce.png?raw=true)
 
 
 
