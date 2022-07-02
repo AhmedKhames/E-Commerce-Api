@@ -6,7 +6,7 @@ A REST and GraphQl ecommerce Api using NodeJs , TypeScript , express.js and MySq
 * User Authentication
 * Adding ,deleting and updating category and product
 * Shopping Cart 
-* Order placement with card payment options
+* Order placement with card payment option
 
 ## Getting Started
 ### Installation 
