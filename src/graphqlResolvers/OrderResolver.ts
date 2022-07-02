@@ -5,8 +5,6 @@ import { Cart } from "../models/Cart";
 import { Cart_item } from "../models/Cart_item";
 import { Order } from "../models/Order";
 import { Order_Item } from "../models/Order_Item";
-import { Payment_Details } from "../models/Payment_Details";
-import { PayType } from "../models/PayType";
 import { Product } from "../models/Product";
 import { UserAddresses } from "../models/UserAddresses";
 import { UserPhones } from "../models/UserPhones";
@@ -22,7 +20,6 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 export class OrderResolver {
   @Mutation((returns) => Order)
   async addOrderUsingCard(
-    @Arg("cart") cartId: number,
     @Arg("address", { defaultValue: "" }) address: string,
     @Arg("phoneNumber", { defaultValue: "" }) phoneNumber: string,
     @Arg("cardInfo") cardInfo: CardInput,
@@ -33,27 +30,24 @@ export class OrderResolver {
     }
     let userId = context.req.userId;
     let loggedUser = await Users.findByPk(userId);
-    let cart = await Cart.findOne({ where: { id: cartId } });
+    let cartId = loggedUser?.CartId;
     let order: Order = new Order();
     let cartItems = await Cart_item.findAll({ where: { CartId: cartId } });
 
     if (cartItems.length !== 0) {
-      if (cart?.UserId.toString() !== context.req.userId.toString()) {
-        throw new Error("Not your cart");
-      }
-      let user = await Users.findOne({ where: { id: cart.UserId.toString() } });
+
       let addresses;
       if (address.length !== 0) {
         addresses = await UserAddresses.create({
-          UserId: user?.id,
+          UserId: userId,
           address: address,
         });
-        if (user) {
-          user.addressId = addresses.id;
+        if (loggedUser) {
+          loggedUser.addressId = addresses.id;
         }
       } else {
         addresses = await UserAddresses.findOne({
-          where: { UserId: user?.id },
+          where: { UserId: userId },
         });
 
         address = addresses!.address.toString();
@@ -62,21 +56,20 @@ export class OrderResolver {
       let phoneNumbers;
       if (phoneNumber.length !== 0) {
         phoneNumbers = await UserPhones.create({
-          UserId: user?.id,
+          UserId: userId,
           phoneNumber: phoneNumber,
         });
-        if (user) {
-          user.phoneNumberId = phoneNumbers.id;
+        if (loggedUser) {
+          loggedUser.phoneNumberId = phoneNumbers.id;
         }
       } else {
         phoneNumbers = await UserPhones.findOne({
-          where: { UserId: user?.id },
+          where: { UserId: userId},
         });
 
         phoneNumber = phoneNumbers!.phoneNumber.toString();
       }
-      await user?.save();
-      // quantity ProductId
+      await loggedUser?.save();
       let totalSum = 0;
       let totalQuantity = 0;
       for (const item of cartItems) {
@@ -91,7 +84,7 @@ export class OrderResolver {
         address: address,
         phoneNumber: phoneNumber,
         total: totalSum,
-        UserId: cart.UserId,
+        UserId: userId
       });
       let orderId = order.id;
       let orders = [];
@@ -104,11 +97,9 @@ export class OrderResolver {
           ProductId: prodId,
         });
       }
-      // let orderItems = await Order_Item.bulkCreate(orders);
-
-      // to create stripe customer we need
-      // 1 - email 2 - name  3 - token that generated from card number and CVC
-
+    
+      await Order_Item.bulkCreate(orders);
+  
       try {
         const token = await stripe.tokens.create({
           card: {
@@ -143,111 +134,7 @@ export class OrderResolver {
     }
   }
 
-  @Mutation((returns) => Order)
-  async addOrder(
-    @Arg("cart") cartId: number,
-    @Arg("address", { defaultValue: "" }) address: string,
-    @Arg("phoneNumber", { defaultValue: "" }) phoneNumber: string,
-    @Arg("payType") payType: string,
-    @Ctx() context: SessionCtx
-  ): Promise<Order> {
-    if (!context.req.isAuth) {
-      throw new Error("You Must log in");
-    }
-    let userId = context.req.userId;
-    let cart = await Cart.findOne({ where: { id: cartId } });
-    let order: Order = new Order();
-    let cartItems = await Cart_item.findAll({ where: { CartId: cartId } });
-
-    if (cartItems.length !== 0) {
-      if (cart?.UserId.toString() !== context.req.userId.toString()) {
-        throw new Error("Not your cart");
-      }
-      let user = await Users.findOne({ where: { id: cart.UserId.toString() } });
-      let addresses;
-      if (address.length !== 0) {
-        addresses = await UserAddresses.create({
-          UserId: user?.id,
-          address: address,
-        });
-        if (user) {
-          user.addressId = addresses.id;
-        }
-      } else {
-        addresses = await UserAddresses.findOne({
-          where: { UserId: user?.id },
-        });
-
-        address = addresses!.address.toString();
-      }
-
-      let phoneNumbers;
-      if (phoneNumber.length !== 0) {
-        phoneNumbers = await UserPhones.create({
-          UserId: user?.id,
-          phoneNumber: phoneNumber,
-        });
-        if (user) {
-          user.phoneNumberId = phoneNumbers.id;
-        }
-      } else {
-        phoneNumbers = await UserPhones.findOne({
-          where: { UserId: user?.id },
-        });
-
-        phoneNumber = phoneNumbers!.phoneNumber.toString();
-      }
-      await user?.save();
-      // quantity ProductId
-      let totalSum = 0;
-      let totalQuantity = 0;
-      for (const item of cartItems) {
-        let product = await Product.findOne({ where: { id: item.ProductId } });
-        let quantity = item.quantity;
-        if (product) {
-          totalSum += product.price * quantity;
-        }
-        totalQuantity += quantity;
-      }
-      order = await Order.create({
-        address: address,
-        phoneNumber: phoneNumber,
-        total: totalSum,
-        UserId: cart.UserId,
-      });
-      let orderId = order.id;
-      let orders = [];
-      for (const item of cartItems) {
-        let prodId = item.ProductId;
-        let quantity = item.quantity;
-        orders.push({
-          quantity: quantity,
-          OrderId: orderId,
-          ProductId: prodId,
-        });
-      }
-      // let orderItems = await Order_Item.bulkCreate(orders);
-
-      if (payType === "COD") {
-        await Order_Item.bulkCreate(orders);
-        let paymentType = await PayType.findOne({ type: payType });
-        if (paymentType) {
-          await Payment_Details.create({
-            amount: order.total,
-            pay_type: paymentType.id,
-            OrderId: order.id,
-          });
-        }
-      }
-
-      cartItems.forEach((item) => {
-        item.destroy();
-      });
-      return order;
-    } else {
-      throw new Error("The cart is empty");
-    }
-  }
+  
 
   @Query((returns) => OrderData)
   async getOrderItems(

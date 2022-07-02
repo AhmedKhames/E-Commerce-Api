@@ -32,6 +32,11 @@ export class Users extends Model {
   @Column(DataTypes.STRING)
   email!: string;
 
+
+  @AllowNull(false)
+  @Column(DataTypes.INTEGER)
+  CartId! :number
+
   @AllowNull(true)
   // @ForeignKey(() => Users)
   @Column(DataTypes.INTEGER)
@@ -41,6 +46,7 @@ export class Users extends Model {
   // @ForeignKey(() => Users)
   @Column(DataTypes.INTEGER)
   phoneNumberId!: number;
+
 
 
 }

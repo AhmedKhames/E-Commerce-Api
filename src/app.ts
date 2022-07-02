@@ -3,7 +3,6 @@ import { Cart } from "./models/Cart";
 import { Cart_item } from "./models/Cart_item";
 import { Order } from "./models/Order";
 import { Order_Item } from "./models/Order_Item";
-import { Payment_Details } from "./models/Payment_Details";
 import { Product } from "./models/Product";
 import { Product_Category } from "./models/Product_Category";
 import { Users } from "./models/Users";
@@ -25,7 +24,7 @@ import { CartData } from "./graphqlResolvers/Inputs/inputProduct";
 import { UserPhones } from "./models/UserPhones";
 import { UserAddresses } from "./models/UserAddresses";
 import { OrderResolver } from "./graphqlResolvers/OrderResolver";
-import { PayType } from "./models/PayType";
+
 import {ErrorHandler} from './Errors/CustomErrorMiddleware'
 
 const fileStorage = multer.diskStorage({
@@ -57,8 +56,10 @@ const fileFilter = (
 };
 
 /// create tables and its relationships MySql;
-Users.hasOne(Cart);
-Cart.belongsTo(Users);
+// Users.hasOne(Cart);
+// Cart.belongsTo(Users);
+Cart.hasOne(Users);
+Users.belongsTo(Cart)
 Users.hasMany(UserAddresses);
 UserAddresses.belongsTo(Users)
 Users.hasMany(UserPhones);
@@ -73,7 +74,7 @@ Cart.belongsToMany(Product, { through: Cart_item });
 Users.hasMany(Order);
 Order.belongsTo(Users);
 Order.belongsToMany(Product, { through: Order_Item });
-Order.hasOne(Payment_Details);
+
 // Payment_Details.hasOne(PayType);
 // PayType.belongsTo(Payment_Details);
 
@@ -140,7 +141,7 @@ async function run() {
     })
   );
   sequelize
-    //  .sync({ alter: true })
+    //  .sync({ force: true })
     // .then(data =>{
     //   PayType.bulkCreate([{type:'COD'},{type:'CARD'}]).then(sucess=>{
     //     console.log("Connection has been established successfully.");
@@ -152,7 +153,7 @@ async function run() {
     //   });
     // })
   
-    .sync()
+    .sync({ force: true })
     .then((res) => {
       //console.log(res);
       console.log("Connection has been established successfully.");

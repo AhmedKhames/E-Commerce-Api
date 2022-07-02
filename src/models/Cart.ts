@@ -22,8 +22,8 @@ export class Cart extends Model {
   @Column(DataTypes.INTEGER)
   id!: number;
 
-  @AllowNull(true)
-  @ForeignKey(() => Users)
-  @Column(DataTypes.INTEGER)
-  UserId!: number;
+  // @AllowNull(true)
+  // @ForeignKey(() => Users)
+  // @Column(DataTypes.INTEGER)
+  // UserId!: number;
 }

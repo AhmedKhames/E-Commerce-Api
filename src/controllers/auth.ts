@@ -41,11 +41,13 @@ const signup = async function (
 
  
     let hashedPassword = await bcrypt.hash(password, 12);
+    const userCart = await Cart.create();
 
     const user = await Users.create({
       name: name,
       password: hashedPassword,
       email: email,
+      CartId:userCart.id
     });
     if (address) {
       const addresses = await UserAddresses.create({
@@ -61,11 +63,11 @@ const signup = async function (
       });
       user.phoneNumberId = phones.id;
     }
+
+
+   
     await user.save();
 
-    await Cart.create({
-      UserId: user.id,
-    });
     res.status(201).json({
       message: "User created",
       userId: user.id,

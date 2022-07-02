@@ -18,8 +18,8 @@ export class CartResolver {
       return Promise.reject("You Must log in");
     }
     let userId = context.req.userId;
-    let cart = await Cart.findOne({ where: { UserId: userId } });
-    let cartId = cart?.id;
+    let cart = await Users.findOne({ where: { id: userId } });
+    let cartId = cart?.CartId;
     let productId = product;
 
     let cartItem = await Cart_item.findOne({
@@ -46,8 +46,8 @@ export class CartResolver {
       return Promise.reject("You Must log in");
     }
 
-    let cart = await Cart.findOne({ where: { UserId: context.req.userId } });
-    let cartId = cart?.id;
+    let cart = await Users.findOne({ where: { id: context.req.userId } });
+    let cartId = cart?.CartId;
     let cartItems = await Cart_item.findAll({ where: { CartId: cartId } });
 
     let cartProduct: CartProduct;
@@ -95,8 +95,8 @@ export class CartResolver {
       return Promise.reject("You Must log in");
     }
     let userId = context.req.userId;
-    let cart = await Cart.findOne({ where: { UserId: userId } });
-    let cartId = cart?.id;
+    let cart = await Users.findOne({ where: { id: userId } });
+    let cartId = cart?.CartId;
 
     let deleteItem = await Cart_item.findOne({
       where: { [Op.and]: [{ CartId: cartId }, { ProductId: prodId }] },

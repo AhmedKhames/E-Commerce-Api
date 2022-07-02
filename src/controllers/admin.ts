@@ -33,7 +33,7 @@ const createCategory = (req: Request, res: Response, next: NextFunction) => {
   const body: ProductCatBody = req.body;
   const name = body.name;
   const imageUrl = req.file.path.replace("\\", "/");
-  console.log(imageUrl);
+  
   const description = body.description;
 
   Product_Category.create({
@@ -84,7 +84,7 @@ const updateCategory = async function (
     const productCat = await Product_Category.findByPk(catId);
     let updatedCat;
     if (!productCat) {
-      return res.status(404).json({ message: "Product Not Found" });
+      return res.status(404).json({ message: "Category Not Found" });
     }
     if (productCat.UserId.toString() === req.userId.toString()) {
       productCat.imageUrl = imageUrl;

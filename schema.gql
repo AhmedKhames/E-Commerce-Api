@@ -33,8 +33,7 @@ type Cart_item {
 }
 
 type Mutation {
-  addOrder(address: String = "", cart: Float!, payType: String!, phoneNumber: String = ""): Order!
-  addOrderUsingCard(address: String = "", cardInfo: CardInput!, cart: Float!, phoneNumber: String = ""): Order!
+  addOrderUsingCard(address: String = "", cardInfo: CardInput!, phoneNumber: String = ""): Order!
   addToCart(product: Float!): Cart_item!
   deleteFromCart(prodId: Float!): Boolean!
 }
