@@ -26,6 +26,7 @@ import { UserPhones } from "./models/UserPhones";
 import { UserAddresses } from "./models/UserAddresses";
 import { OrderResolver } from "./graphqlResolvers/OrderResolver";
 import { PayType } from "./models/PayType";
+import {ErrorHandler} from './Errors/CustomErrorMiddleware'
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -122,7 +123,7 @@ async function run() {
       message: message,
     });
   });
-
+  // app.use(ErrorHandler)
   const schema = await buildSchema({
     resolvers: [ProductResolver, ProductCategoryResolver, CartResolver,OrderResolver],
     emitSchemaFile: true,
@@ -164,3 +165,5 @@ async function run() {
     });
 }
 run();
+
+

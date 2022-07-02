@@ -8,6 +8,7 @@ import { isAuth } from "../middleware/isAuth";
 import { Cart } from "../models/Cart";
 import { UserAddresses } from "../models/UserAddresses";
 import { UserPhones } from "../models/UserPhones";
+import { CustomError } from "../Errors/CustomError";
 
 require("dotenv").config();
 
@@ -24,9 +25,11 @@ const signup = async function (
   res: express.Response,
   next: any
 ) {
+  try {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    // throw new CustomError('Validation Error',400,errors.array())
+   return res.status(400).json({ errors: errors.array() });
   }
   const body = req.body as BodyData;
   const name: string = body.name;
@@ -36,7 +39,7 @@ const signup = async function (
   const address: string | undefined = body.address;
   const phoneNumber: string | undefined = body.phoneNumber;
 
-  try {
+ 
     let hashedPassword = await bcrypt.hash(password, 12);
 
     const user = await Users.create({
@@ -68,17 +71,21 @@ const signup = async function (
       userId: user.id,
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: "creation error",
-    });
+    //err.message = 'creation error'
+    //err =  new CustomError('Creation error',500)
+      next(err);
+   // next(err);
+    // res.status(500).json({
+    //   message: "creation error",
+    // });
   }
-
 };
 
 const login = (req: express.Request, res: express.Response, next: any) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+  // throw new CustomError('Validation Error',400,errors.array())
+    
     return res.status(400).json({ errors: errors.array() });
   }
   const body = req.body as BodyData;
@@ -123,7 +130,7 @@ const login = (req: express.Request, res: express.Response, next: any) => {
       });
     })
     .catch((err) => {
-      //   console.log(err);
+      
       next(err);
     });
 };
