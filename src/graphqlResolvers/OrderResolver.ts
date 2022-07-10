@@ -23,12 +23,12 @@ export class OrderResolver {
     @Arg("address", { defaultValue: "" }) address: string,
     @Arg("phoneNumber", { defaultValue: "" }) phoneNumber: string,
     @Arg("cardInfo") cardInfo: CardInput,
-    @Ctx() context: SessionCtx
+    @Ctx() context: Express.Request
   ): Promise<Order> {
-    if (!context.req.isAuth) {
+    if (!context.isAuth) {
       throw new Error("You Must log in");
     }
-    let userId = context.req.userId;
+    let userId = context.userId;
     let loggedUser = await Users.findByPk(userId);
     let cartId = loggedUser?.CartId;
     let order: Order = new Order();

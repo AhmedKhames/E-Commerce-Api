@@ -17,16 +17,12 @@ export class ProductCategoryResolver {
 
   @Query((returns) => Product_Category)
   async getProductCategory(
-    @Arg("prodId") productId: number,
-    
+    @Arg("prodId") productId: number
   ): Promise<Product_Category | null> {
     let product = await Product_Category.findByPk(productId);
     if (product) {
       return product;
     } else {
-      //    context.res.status(404).json({
-      //       message:"Product Not Found"
-      //   })
       return null;
     }
   }

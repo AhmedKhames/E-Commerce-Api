@@ -137,23 +137,13 @@ async function run() {
      return { schema: schema,
       graphiql: true,
       context:{ req},
+  
      }
+     
     })
   );
   sequelize
-    //  .sync({ force: true })
-    // .then(data =>{
-    //   PayType.bulkCreate([{type:'COD'},{type:'CARD'}]).then(sucess=>{
-    //     console.log("Connection has been established successfully.");
-    //     app.listen(process.env.APPLICATION_PORT, () => {
-    //       console.log(`Litening on port  ${process.env.APPLICATION_PORT}`);
-    //     });
-    //   }).catch((err) => {
-    //     console.error("Unable to connect to the database:", err);
-    //   });
-    // })
-  
-    .sync({ force: true })
+    .sync()
     .then((res) => {
       //console.log(res);
       console.log("Connection has been established successfully.");

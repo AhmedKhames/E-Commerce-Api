@@ -24,9 +24,7 @@ export class ProductResolver {
     if (product) {
       return product;
     } else {
-      //    context.res.status(404).json({
-      //       message:"Product Not Found"
-      //   })
+     
       return null;
     }
   }
